@@ -1,0 +1,124 @@
+@import "@fontsource/manrope/400.css";
+@import "@fontsource/manrope/500.css";
+@import "@fontsource/manrope/600.css";
+@import "@fontsource/manrope/700.css";
+@import "@fontsource/manrope/800.css";
+
+@import "@fontsource/cormorant-garamond/400.css";
+@import "@fontsource/cormorant-garamond/500.css";
+@import "@fontsource/cormorant-garamond/600.css";
+@import "@fontsource/cormorant-garamond/700.css";
+
+@import "@fontsource/tangerine/400.css";
+@import "@fontsource/tangerine/700.css";
+
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  --font-manrope: "Manrope", sans-serif;
+  --font-cormorant: "Cormorant Garamond", serif;
+  --font-tangerine: "Tangerine", cursive;
+
+  --color-primary: #a875d1;
+  --color-primaryDark: #8f5db9;
+  --color-primaryLight: #e8d9f3;
+  --color-primarySoft: #f0e6f6;
+
+  --color-background: #f7f2fa;
+  --color-backgroundSoft: #fbf8fd;
+
+  --color-surface: #fffcff;
+  --color-surfaceSoft: #fbf8fd;
+  --color-surfaceLight: #fdf9ff;
+
+  --color-logoBackground: #bfa2db;
+  --color-accent: #a77bcb;
+  --color-accentLight: #e8d9f3;
+
+  --color-text: #3d3046;
+  --color-textDark: #2f2638;
+  --color-textMuted: #777085;
+  --color-textLight: #817a90;
+
+  --color-border: #ded8e7;
+  --color-borderSoft: #e9dff1;
+  --color-shadow: #e9dff1;
+
+  --shadow-card: 0 22px 65px rgba(50, 35, 64, 0.08);
+  --shadow-cardSoft: 0 14px 40px rgba(50, 35, 64, 0.06);
+  --shadow-cardStrong: 0 26px 80px rgba(50, 35, 64, 0.12);
+  --shadow-button: 0 14px 32px rgba(168, 117, 209, 0.28);
+}
+
+@utility font-manrope {
+  font-family: "Manrope", sans-serif;
+  font-weight: 400;
+}
+
+@utility font-manropeMedium {
+  font-family: "Manrope", sans-serif;
+  font-weight: 500;
+}
+
+@utility font-manropeSemiBold {
+  font-family: "Manrope", sans-serif;
+  font-weight: 600;
+}
+
+@utility font-manropeBold {
+  font-family: "Manrope", sans-serif;
+  font-weight: 700;
+}
+
+@utility font-manropeExtraBold {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+}
+
+@utility font-cormorant {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+}
+
+@utility font-cormorantMedium {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 500;
+}
+
+@utility font-cormorantSemiBold {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 600;
+}
+
+@utility font-cormorantBold {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 700;
+}
+
+@utility font-tangerine {
+  font-family: "Tangerine", cursive;
+  font-weight: 400;
+}
+
+@utility font-tangerineBold {
+  font-family: "Tangerine", cursive;
+  font-weight: 700;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  background: #f7f2fa;
+  color: #2f2638;
+}
