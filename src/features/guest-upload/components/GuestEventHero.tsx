@@ -28,7 +28,7 @@ export function GuestEventHero({ event }: GuestEventHeroProps) {
           size={25}
           strokeWidth={0}
           fill="currentColor"
-          className="text-primary"
+          className="text-primaryDark"
         />
 
         <AppText

@@ -7,6 +7,8 @@ import { AppText } from "@/components/ui/AppText";
 import { EventCodeCard } from "../components/EventCodeCard";
 import { AppBackButton } from "@/components/ui/AppBackButton";
 
+import purpleHeartDivider from "@/assets/images/purple-heart-divider.png";
+
 export function GuestAccessPage() {
   const navigate = useNavigate();
 
@@ -41,15 +43,12 @@ export function GuestAccessPage() {
               Weddion ile davetiyeler artık daha romantik ve modern.
             </AppText>
 
-            <div
-              className="mx-auto mt-3 flex items-center justify-center gap-2 text-[#C9AFE0]"
-              aria-hidden="true"
-            >
-              <span className="h-px w-8 bg-current opacity-60" />
-              <span className="text-[16px]">✦</span>
-              <span className="text-[18px]">♥</span>
-              <span className="text-[16px]">✦</span>
-              <span className="h-px w-8 bg-current opacity-60" />
+            <div className="my-4 flex justify-center">
+              <img
+                src={purpleHeartDivider}
+                alt=""
+                className="h-8 w-auto object-contain opacity-80"
+              />
             </div>
           </div>
         </section>
