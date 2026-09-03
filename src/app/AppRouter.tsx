@@ -16,6 +16,7 @@ import { AdminUsersPage } from "@/features/admin/pages/AdminUsersPage";
 import { AdminInvitationsPage } from "@/features/admin/pages/AdminInvitationsPage";
 import { AdminTemplatesPage } from "@/features/admin/pages/AdminTemplatesPage";
 import { GuestAccessPage } from "@/features/guest-access/pages/GuestAccessPage";
+import { GuestQrScanPage } from "@/features/guest-access/pages/GuestQrScanPage";
 
 export const AppRouter = () => {
   return (
@@ -26,6 +27,7 @@ export const AppRouter = () => {
         </Route>
 
         <Route path="/guest-access" element={<GuestAccessPage />} />
+        <Route path="/qr-scan" element={<GuestQrScanPage />} />
 
         <Route element={<PublicOnlyRoute />}>
           <Route path="/login" element={<LoginPage />} />

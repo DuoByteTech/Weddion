@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { KeyRound, QrCode } from "lucide-react";
 
@@ -8,6 +9,8 @@ import { AppButton } from "@/components/ui/AppButton";
 const CODE_LENGTH = 9;
 
 export function EventCodeCard() {
+  const navigate = useNavigate();
+
   const [characters, setCharacters] = useState<string[]>(
     Array(CODE_LENGTH).fill(""),
   );
@@ -66,6 +69,10 @@ export function EventCodeCard() {
     if (event.key === "ArrowRight" && index < CODE_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
     }
+  };
+
+  const handleQrScanClick = () => {
+    navigate("/qr-scan");
   };
 
   return (
@@ -158,7 +165,12 @@ export function EventCodeCard() {
           Kodu Kontrol Et
         </AppButton>
 
-        <AppButton type="button" variant="outline" className="mt-4 w-full">
+        <AppButton
+          type="button"
+          variant="outline"
+          onClick={handleQrScanClick}
+          className="mt-4 w-full"
+        >
           <QrCode size={22} strokeWidth={2} />
           QR Kod Okut
         </AppButton>

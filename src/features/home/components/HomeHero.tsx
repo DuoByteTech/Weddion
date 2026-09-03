@@ -15,6 +15,7 @@ const actionItems: HomeActionItem[] = [
     description:
       "Davet sahibinin paylaştığı QR kodu okutarak fotoğraf yükleme alanına ulaş.",
     icon: QrCode,
+    path: "/qr-scan",
   },
   {
     title: "Etkinlik kodu ile devam et",
