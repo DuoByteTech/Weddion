@@ -2,10 +2,20 @@ import { supabase } from "@/lib/supabase";
 
 import type { GuestInvitation } from "@/features/guest-access/types/guest-access.types";
 
+function normalizeGuestCode(value: string) {
+  const cleanedCode = value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+
+  if (cleanedCode.length <= 3) {
+    return cleanedCode;
+  }
+
+  return `${cleanedCode.slice(0, 3)}-${cleanedCode.slice(3)}`;
+}
+
 export async function getInvitationByGuestCode(
   code: string,
 ): Promise<GuestInvitation | null> {
-  const normalizedCode = code.trim().toUpperCase();
+  const normalizedCode = normalizeGuestCode(code);
 
   const { data, error } = await supabase.rpc(
     "get_invitation_for_guest_by_code",
