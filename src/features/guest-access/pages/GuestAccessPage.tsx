@@ -1,4 +1,3 @@
-import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { AppLogo } from "@/components/common/AppLogo";
@@ -6,6 +5,7 @@ import { FloralDecorations } from "@/components/common/FloralDecorations";
 import { AppText } from "@/components/ui/AppText";
 
 import { EventCodeCard } from "../components/EventCodeCard";
+import { AppBackButton } from "@/components/ui/AppBackButton";
 
 export function GuestAccessPage() {
   const navigate = useNavigate();
@@ -16,19 +16,7 @@ export function GuestAccessPage() {
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 sm:px-6 lg:px-10">
         <header className="flex h-20 items-center sm:h-24">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            aria-label="Geri dön"
-            className="
-              flex size-11 items-center justify-center
-              rounded-full text-[#6A5875]
-              transition-colors
-              hover:bg-white/70 hover:text-[#8F5DB9]
-            "
-          >
-            <ArrowLeft size={25} strokeWidth={1.8} />
-          </button>
+          <AppBackButton onClick={() => navigate(-1)} />
         </header>
 
         <section className="flex flex-1 flex-col items-center pb-10">

@@ -144,6 +144,7 @@ export function EventCodeCard() {
                     "rounded-xl border bg-white",
                     "text-[16px] font-semibold uppercase text-[#6A5875]",
                     "placeholder:text-[#C9C0D0]",
+                    "caret-[#A875D1]",
                     "transition-all duration-200",
                     "outline-none",
                     "sm:h-[60px] sm:rounded-2xl sm:text-[18px]",
