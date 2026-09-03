@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { deleteR2Object, uploadFileToR2 } from "@/services/r2ImageService";
 import { compressGuestPhoto } from "@/utils/imageCompression";
+import type { GuestInvitation } from "@/features/guest-access/types/guest-access.types";
 
 type UploadGuestPhotosParams = {
   invitationId: string;
@@ -66,7 +67,6 @@ function buildGuestPhotoPath(
   file: File,
 ) {
   const extension = getExtension(file);
-
   const fileName = `${Date.now()}-${Math.random()
     .toString(36)
     .slice(2, 10)}.${extension}`;
@@ -74,6 +74,29 @@ function buildGuestPhotoPath(
   return `guest-photos/${invitationId}/${normalizeGuestUploadCode(
     guestUploadCode,
   )}/${fileName}`;
+}
+
+export async function getInvitationByGuestSlug(
+  slug: string,
+): Promise<GuestInvitation | null> {
+  const normalizedSlug = slug.trim();
+
+  if (!normalizedSlug) {
+    return null;
+  }
+
+  const { data, error } = await supabase.rpc(
+    "get_invitation_for_guest_by_slug",
+    {
+      target_slug: normalizedSlug,
+    },
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data?.[0] ?? null) as GuestInvitation | null;
 }
 
 export async function uploadGuestPhotos({

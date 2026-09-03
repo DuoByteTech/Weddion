@@ -1,16 +1,13 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { AdminLayout } from "@/components/layout/admin/AdminLayout";
-
 import { HomePage } from "@/features/home/pages/HomePage";
-
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RegisterPage } from "@/features/auth/pages/RegisterPage";
 import { ForgotPasswordPage } from "@/features/auth/pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "@/features/auth/pages/ResetPasswordPage";
 import { RequireAdmin } from "@/features/auth/components/RequireAdmin";
 import { PublicOnlyRoute } from "@/features/auth/components/PublicOnlyRoute";
-
 import { AdminDashboardPage } from "@/features/admin/pages/AdminDashboardPage";
 import { AdminUsersPage } from "@/features/admin/pages/AdminUsersPage";
 import { AdminInvitationsPage } from "@/features/admin/pages/AdminInvitationsPage";
@@ -30,6 +27,7 @@ export const AppRouter = () => {
         <Route path="/guest-access" element={<GuestAccessPage />} />
         <Route path="/qr-scan" element={<GuestQrScanPage />} />
         <Route path="/guest-upload" element={<GuestPhotoUploadPage />} />
+        <Route path="/guest-upload/:slug" element={<GuestPhotoUploadPage />} />
 
         <Route element={<PublicOnlyRoute />}>
           <Route path="/login" element={<LoginPage />} />

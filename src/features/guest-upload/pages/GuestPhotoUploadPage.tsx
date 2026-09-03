@@ -1,10 +1,12 @@
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { Sparkles } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+
 import { AppBackButton } from "@/components/ui/AppBackButton";
 import { AppButton } from "@/components/ui/AppButton";
 import { AppContainer } from "@/components/ui/AppContainer";
 import { AppText } from "@/components/ui/AppText";
+
 import { GuestEventHero } from "../components/GuestEventHero";
 import { PhotoSourceActions } from "../components/PhotoSourceActions";
 import {
@@ -12,9 +14,14 @@ import {
   type SelectedGuestPhoto,
 } from "../components/SelectedPhotosSection";
 import { UploadPrivacyNotice } from "../components/UploadPrivacyNotice";
+
 import type { GuestInvitation } from "@/features/guest-access/types/guest-access.types";
 import type { GuestEventInfo } from "../types/guest-upload.types";
-import { uploadGuestPhotos } from "@/services/guestPhotoService";
+
+import {
+  getInvitationByGuestSlug,
+  uploadGuestPhotos,
+} from "@/services/guestPhotoService";
 
 const MAX_PHOTOS_PER_UPLOAD = 20;
 
@@ -22,11 +29,27 @@ type GuestUploadLocationState = {
   invitation?: GuestInvitation;
 };
 
+type GuestUploadParams = {
+  slug?: string;
+};
+
 export function GuestPhotoUploadPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { slug } = useParams<GuestUploadParams>();
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
+
+  const locationState =
+    (location.state as GuestUploadLocationState | null) ?? null;
+
+  const [invitation, setInvitation] = useState<GuestInvitation | null>(
+    locationState?.invitation ?? null,
+  );
+  const [isLoadingInvitation, setIsLoadingInvitation] = useState(
+    Boolean(slug) && !locationState?.invitation,
+  );
   const [selectedPhotos, setSelectedPhotos] = useState<SelectedGuestPhoto[]>(
     [],
   );
@@ -34,8 +57,67 @@ export function GuestPhotoUploadPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const { invitation } =
-    (location.state as GuestUploadLocationState | null) ?? {};
+  useEffect(() => {
+    if (!slug) {
+      return;
+    }
+
+    const guestSlug = slug;
+    let isMounted = true;
+
+    async function loadInvitationBySlug() {
+      try {
+        setIsLoadingInvitation(true);
+        setErrorMessage(null);
+
+        const data = await getInvitationByGuestSlug(guestSlug);
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (!data) {
+          setInvitation(null);
+          setErrorMessage(
+            "QR kod geçersiz, süresi dolmuş veya bu etkinlik için fotoğraf yükleme kapalı olabilir.",
+          );
+          return;
+        }
+
+        setInvitation(data);
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        console.error("QR davetiyesi alınamadı:", error);
+        setInvitation(null);
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Etkinlik bilgileri alınamadı. Lütfen tekrar deneyin.",
+        );
+      } finally {
+        if (isMounted) {
+          setIsLoadingInvitation(false);
+        }
+      }
+    }
+
+    void loadInvitationBySlug();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [slug]);
+
+  useEffect(() => {
+    return () => {
+      selectedPhotos.forEach((photo) => {
+        URL.revokeObjectURL(photo.previewUrl);
+      });
+    };
+  }, []);
 
   const event: GuestEventInfo | null = invitation
     ? {
@@ -45,14 +127,6 @@ export function GuestPhotoUploadPage() {
         eventTime: invitation.event_time ?? "",
       }
     : null;
-
-  useEffect(() => {
-    return () => {
-      selectedPhotos.forEach((photo) => {
-        URL.revokeObjectURL(photo.previewUrl);
-      });
-    };
-  }, []);
 
   const handleGallerySelect = () => {
     setErrorMessage(null);
@@ -193,10 +267,33 @@ export function GuestPhotoUploadPage() {
     }
   };
 
+  if (isLoadingInvitation) {
+    return (
+      <main className="relative min-h-screen bg-background">
+        <AppContainer className="!max-w-[620px] py-24">
+          <div className="text-center">
+            <AppText
+              as="h1"
+              variant="serifTitle"
+              className="!text-[38px] leading-none"
+            >
+              Etkinlik yükleniyor
+            </AppText>
+
+            <AppText variant="body" className="mt-4 leading-7 text-textMuted">
+              QR kod kontrol ediliyor...
+            </AppText>
+          </div>
+        </AppContainer>
+      </main>
+    );
+  }
+
   if (!event) {
     return (
       <main className="relative min-h-screen bg-background">
         <AppBackButton onClick={() => navigate("/guest-access")} />
+
         <AppContainer className="!max-w-[620px] py-24">
           <div className="text-center">
             <AppText
@@ -206,10 +303,20 @@ export function GuestPhotoUploadPage() {
             >
               Etkinlik bulunamadı
             </AppText>
+
             <AppText variant="body" className="mt-4 leading-7 text-textMuted">
               Fotoğraf yüklemek için geçerli bir etkinlik kodu veya QR kod
               kullanmalısınız.
             </AppText>
+
+            {errorMessage ? (
+              <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+                <AppText variant="body" className="!text-[13px] !text-red-500">
+                  {errorMessage}
+                </AppText>
+              </div>
+            ) : null}
+
             <AppButton
               type="button"
               onClick={() => navigate("/guest-access")}
@@ -227,7 +334,9 @@ export function GuestPhotoUploadPage() {
     <main className="relative min-h-screen bg-background">
       <AppContainer className="!max-w-[860px] py-6 sm:py-8 lg:py-10">
         <AppBackButton onClick={() => navigate(-1)} />
+
         <GuestEventHero event={event} />
+
         <section className="mt-8">
           <div className="flex items-center gap-2">
             <AppText
@@ -237,12 +346,14 @@ export function GuestPhotoUploadPage() {
             >
               Anılarınızı paylaşın
             </AppText>
+
             <Sparkles
               size={28}
               strokeWidth={1.8}
               className="text-primaryDark"
             />
           </div>
+
           <AppText
             variant="body"
             className="mt-3 !text-[14px] leading-6 text-textMuted sm:!text-[15px]"
@@ -250,6 +361,7 @@ export function GuestPhotoUploadPage() {
             Bu özel günden fotoğraflarınızı etkinlik galerisine yükleyin.
           </AppText>
         </section>
+
         <input
           ref={fileInputRef}
           type="file"
@@ -258,6 +370,7 @@ export function GuestPhotoUploadPage() {
           onChange={handleFilesSelected}
           className="hidden"
         />
+
         <input
           ref={cameraInputRef}
           type="file"
@@ -266,12 +379,14 @@ export function GuestPhotoUploadPage() {
           onChange={handleCameraSelected}
           className="hidden"
         />
+
         <div className="mt-7">
           <PhotoSourceActions
             onCameraCapture={handleCameraCapture}
             onGallerySelect={handleGallerySelect}
           />
         </div>
+
         {errorMessage ? (
           <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
             <AppText variant="body" className="!text-[13px] !text-red-500">
@@ -279,6 +394,7 @@ export function GuestPhotoUploadPage() {
             </AppText>
           </div>
         ) : null}
+
         {successMessage ? (
           <div className="mt-5 rounded-2xl border border-green-200 bg-green-50 px-4 py-3">
             <AppText variant="body" className="!text-[13px] !text-green-700">
@@ -286,6 +402,7 @@ export function GuestPhotoUploadPage() {
             </AppText>
           </div>
         ) : null}
+
         <div className="mt-9">
           <SelectedPhotosSection
             photos={selectedPhotos}
@@ -293,9 +410,11 @@ export function GuestPhotoUploadPage() {
             onRemoveAll={handleRemoveAll}
           />
         </div>
+
         <div className="mt-8">
           <UploadPrivacyNotice />
         </div>
+
         <AppButton
           type="button"
           disabled={selectedPhotos.length === 0 || isUploading}
