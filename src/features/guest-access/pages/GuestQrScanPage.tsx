@@ -1,23 +1,29 @@
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { QrScanInfoCard } from "../components/QrScanInfoCard";
 import { AppBackButton } from "@/components/ui/AppBackButton";
+
+import { QrCamera } from "../components/QrCamera";
+import { QrScanInfoCard } from "../components/QrScanInfoCard";
 
 export function GuestQrScanPage() {
   const navigate = useNavigate();
 
+  const handleQrScan = useCallback((value: string) => {
+    console.log("Okunan QR:", value);
+
+    // Şimdilik sadece QR okunduğunu görüyoruz.
+    // Supabase / slug doğrulamasını daha sonra bağlayacağız.
+  }, []);
+
   return (
-    <main className="min-h-screen bg-black">
+    <main className="relative min-h-screen bg-black">
+      <AppBackButton onClick={() => navigate(-1)} />
+
       <div className="mx-auto flex min-h-screen w-full max-w-[1440px] flex-col">
-        <div className="relative flex flex-1 flex-col bg-black">
-          <AppBackButton onClick={() => navigate(-1)} />
+        <QrCamera onScan={handleQrScan} />
 
-          <div className="flex min-h-[430px] flex-1 items-center justify-center sm:min-h-[520px] lg:min-h-[600px]">
-            {/* Kamera daha sonra bu alanın tamamını dolduracak. */}
-          </div>
-
-          <QrScanInfoCard />
-        </div>
+        <QrScanInfoCard />
       </div>
     </main>
   );
