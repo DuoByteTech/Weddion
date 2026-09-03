@@ -1,5 +1,4 @@
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
-
 import { Sparkles } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -19,6 +18,8 @@ import { UploadPrivacyNotice } from "../components/UploadPrivacyNotice";
 import type { GuestInvitation } from "@/features/guest-access/types/guest-access.types";
 import type { GuestEventInfo } from "../types/guest-upload.types";
 
+import { uploadGuestPhotos } from "@/services/guestPhotoService";
+
 const MAX_PHOTOS_PER_UPLOAD = 20;
 
 type GuestUploadLocationState = {
@@ -28,14 +29,14 @@ type GuestUploadLocationState = {
 export function GuestPhotoUploadPage() {
   const navigate = useNavigate();
   const location = useLocation();
-
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [selectedPhotos, setSelectedPhotos] = useState<SelectedGuestPhoto[]>(
     [],
   );
-
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { invitation } =
     (location.state as GuestUploadLocationState | null) ?? {};
@@ -59,6 +60,7 @@ export function GuestPhotoUploadPage() {
 
   const handleGallerySelect = () => {
     setErrorMessage(null);
+    setSuccessMessage(null);
     fileInputRef.current?.click();
   };
 
@@ -70,14 +72,13 @@ export function GuestPhotoUploadPage() {
     }
 
     setErrorMessage(null);
+    setSuccessMessage(null);
 
     const remainingPhotoCount = MAX_PHOTOS_PER_UPLOAD - selectedPhotos.length;
 
     if (remainingPhotoCount <= 0) {
       setErrorMessage("Tek seferde en fazla 20 fotoğraf seçebilirsiniz.");
-
       event.target.value = "";
-
       return;
     }
 
@@ -103,10 +104,6 @@ export function GuestPhotoUploadPage() {
 
     setSelectedPhotos((currentPhotos) => [...currentPhotos, ...newPhotos]);
 
-    /*
-     * Aynı fotoğraf daha sonra yeniden seçilebilsin diye
-     * input değerini temizliyoruz.
-     */
     event.target.value = "";
   };
 
@@ -122,6 +119,7 @@ export function GuestPhotoUploadPage() {
     });
 
     setErrorMessage(null);
+    setSuccessMessage(null);
   };
 
   const handleRemoveAll = () => {
@@ -131,6 +129,59 @@ export function GuestPhotoUploadPage() {
 
     setSelectedPhotos([]);
     setErrorMessage(null);
+    setSuccessMessage(null);
+  };
+
+  const handleUploadPhotos = async () => {
+    if (!invitation) {
+      setErrorMessage("Etkinlik bilgisi bulunamadı.");
+      return;
+    }
+
+    if (selectedPhotos.length === 0) {
+      return;
+    }
+
+    if (!invitation.guest_upload_code) {
+      setErrorMessage("Etkinlik yükleme kodu bulunamadı.");
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      setErrorMessage(null);
+      setSuccessMessage(null);
+
+      const uploadCount = selectedPhotos.length;
+
+      await uploadGuestPhotos({
+        invitationId: invitation.id,
+        guestUploadCode: invitation.guest_upload_code,
+        files: selectedPhotos.map((photo) => photo.file),
+      });
+
+      selectedPhotos.forEach((photo) => {
+        URL.revokeObjectURL(photo.previewUrl);
+      });
+
+      setSelectedPhotos([]);
+
+      setSuccessMessage(
+        uploadCount > 1
+          ? `${uploadCount} fotoğraf başarıyla yüklendi.`
+          : "Fotoğraf başarıyla yüklendi.",
+      );
+    } catch (error) {
+      console.error("Fotoğraf yükleme hatası:", error);
+
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Fotoğraflar yüklenemedi. Lütfen tekrar deneyin.",
+      );
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   if (!event) {
@@ -219,6 +270,14 @@ export function GuestPhotoUploadPage() {
           </div>
         ) : null}
 
+        {successMessage ? (
+          <div className="mt-5 rounded-2xl border border-green-200 bg-green-50 px-4 py-3">
+            <AppText variant="body" className="!text-[13px] !text-green-700">
+              {successMessage}
+            </AppText>
+          </div>
+        ) : null}
+
         <div className="mt-9">
           <SelectedPhotosSection
             photos={selectedPhotos}
@@ -233,11 +292,17 @@ export function GuestPhotoUploadPage() {
 
         <AppButton
           type="button"
-          disabled={selectedPhotos.length === 0}
+          disabled={selectedPhotos.length === 0 || isUploading}
+          onClick={() => {
+            void handleUploadPhotos();
+          }}
           className="mt-9 w-full"
         >
-          Fotoğrafları Yükle
-          {selectedPhotos.length > 0 ? ` (${selectedPhotos.length})` : ""}
+          {isUploading
+            ? "Fotoğraflar Yükleniyor..."
+            : `Fotoğrafları Yükle${
+                selectedPhotos.length > 0 ? ` (${selectedPhotos.length})` : ""
+              }`}
         </AppButton>
       </AppContainer>
     </main>
