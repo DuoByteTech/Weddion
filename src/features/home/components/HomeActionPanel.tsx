@@ -1,14 +1,16 @@
 import { Images } from "lucide-react";
+
 import { AppCard } from "@/components/ui/AppCard";
 import { AppText } from "@/components/ui/AppText";
 import { AppActionCard } from "@/components/common/AppActionCard";
+
 import type { HomeActionItem } from "../types/home.types";
 
 type HomeActionPanelProps = {
-  item: HomeActionItem;
+  items: HomeActionItem[];
 };
 
-export function HomeActionPanel({ item }: HomeActionPanelProps) {
+export function HomeActionPanel({ items }: HomeActionPanelProps) {
   return (
     <AppCard className="flex h-full min-h-[360px] flex-col justify-center p-7 sm:p-8 lg:p-10 shadow-card">
       <div className="flex items-center gap-5">
@@ -33,12 +35,16 @@ export function HomeActionPanel({ item }: HomeActionPanelProps) {
         nişan veya davet anılarını kolayca paylaş.
       </AppText>
 
-      <AppActionCard
-        className="mt-8"
-        title={item.title}
-        description={item.description}
-        icon={item.icon}
-      />
+      <div className="mt-8 flex flex-col gap-4">
+        {items.map((item) => (
+          <AppActionCard
+            key={item.title}
+            title={item.title}
+            description={item.description}
+            icon={item.icon}
+          />
+        ))}
+      </div>
     </AppCard>
   );
 }

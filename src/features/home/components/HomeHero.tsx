@@ -1,15 +1,23 @@
-import { KeyRound } from "lucide-react";
+import { KeyRound, QrCode } from "lucide-react";
+
 import { AppContainer } from "@/components/ui/AppContainer";
 import { AppLogo } from "@/components/common/AppLogo";
 import { AppText } from "@/components/ui/AppText";
+
 import { HomeActionPanel } from "./HomeActionPanel";
+
 import type { HomeActionItem } from "../types/home.types";
 
 const actionItems: HomeActionItem[] = [
   {
-    title: "Etkinlik kodu ile devam et",
+    title: "QR kod okutarak devam et",
     description:
-      "Davet sahibinin paylaştığı özel kodu girerek fotoğraf yükleme alanına ulaş.",
+      "Etkinlik sahibinin paylaştığı QR kodu okutarak fotoğraf yükleme alanına ulaş.",
+    icon: QrCode,
+  },
+  {
+    title: "Etkinlik konunu girerek devam et",
+    description: "Etkinlik konunu girerek fotoğraflarınızı yükleyin.",
     icon: KeyRound,
   },
 ];
@@ -34,9 +42,7 @@ export function HomeHero() {
           </AppText>
         </div>
 
-        {actionItems.map((item) => (
-          <HomeActionPanel key={item.title} item={item} />
-        ))}
+        <HomeActionPanel items={actionItems} />
       </div>
     </AppContainer>
   );
