@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { KeyRound, QrCode } from "lucide-react";
 
 import { AppText } from "@/components/ui/AppText";
 import { AppButton } from "@/components/ui/AppButton";
+import { getInvitationByGuestCode } from "@/services/guestInvitationService";
 
 const CODE_LENGTH = 9;
 
@@ -14,6 +14,8 @@ export function EventCodeCard() {
   const [characters, setCharacters] = useState<string[]>(
     Array(CODE_LENGTH).fill(""),
   );
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -26,10 +28,13 @@ export function EventCodeCard() {
       .slice(-1);
 
     const updatedCharacters = [...characters];
-
     updatedCharacters[index] = normalizedValue;
 
     setCharacters(updatedCharacters);
+
+    if (errorMessage) {
+      setErrorMessage(null);
+    }
 
     if (normalizedValue && index < CODE_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
@@ -43,20 +48,26 @@ export function EventCodeCard() {
     if (event.key === "Backspace") {
       if (characters[index]) {
         const updatedCharacters = [...characters];
-
         updatedCharacters[index] = "";
 
         setCharacters(updatedCharacters);
+
+        if (errorMessage) {
+          setErrorMessage(null);
+        }
 
         return;
       }
 
       if (index > 0) {
         const updatedCharacters = [...characters];
-
         updatedCharacters[index - 1] = "";
 
         setCharacters(updatedCharacters);
+
+        if (errorMessage) {
+          setErrorMessage(null);
+        }
 
         inputRefs.current[index - 1]?.focus();
       }
@@ -68,6 +79,42 @@ export function EventCodeCard() {
 
     if (event.key === "ArrowRight" && index < CODE_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
+    }
+
+    if (event.key === "Enter" && code.length === CODE_LENGTH) {
+      void handleCheckCode();
+    }
+  };
+
+  const handleCheckCode = async () => {
+    if (code.length !== CODE_LENGTH || isLoading) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      const invitation = await getInvitationByGuestCode(code);
+
+      if (!invitation) {
+        setErrorMessage("Etkinlik kodu geçersiz veya kullanım süresi dolmuş.");
+        return;
+      }
+
+      navigate("/guest-upload", {
+        state: {
+          invitation,
+        },
+      });
+    } catch (error) {
+      console.error("Etkinlik kodu kontrol hatası:", error);
+
+      setErrorMessage(
+        "Etkinlik kodu kontrol edilirken bir hata oluştu. Lütfen tekrar deneyin.",
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -113,63 +160,69 @@ export function EventCodeCard() {
         </AppText>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {characters.map((character, index) => {
-            return (
-              <div key={index} className="contents">
-                {index === 3 && (
-                  <span className="shrink-0 px-0.5 text-[18px] font-semibold text-[#A875D1] sm:px-1 sm:text-[20px]">
-                    -
-                  </span>
-                )}
+          {characters.map((character, index) => (
+            <div key={index} className="contents">
+              {index === 3 && (
+                <span className="shrink-0 px-0.5 text-[18px] font-semibold text-[#A875D1] sm:px-1 sm:text-[20px]">
+                  -
+                </span>
+              )}
 
-                <input
-                  ref={(element) => {
-                    inputRefs.current[index] = element;
-                  }}
-                  type="text"
-                  value={character}
-                  maxLength={1}
-                  placeholder="-"
-                  autoComplete="off"
-                  autoCapitalize="characters"
-                  spellCheck={false}
-                  aria-label={`Etkinlik kodu ${index + 1}. karakter`}
-                  onChange={(event) =>
-                    handleCodeChange(index, event.target.value)
-                  }
-                  onKeyDown={(event) => handleKeyDown(index, event)}
-                  onFocus={(event) => event.currentTarget.select()}
-                  className={[
-                    "h-[54px] min-w-0 flex-1 text-center",
-                    "rounded-xl border bg-white",
-                    "text-[16px] font-semibold uppercase text-[#6A5875]",
-                    "placeholder:text-[#C9C0D0]",
-                    "caret-[#A875D1]",
-                    "transition-all duration-200",
-                    "outline-none",
-                    "sm:h-[60px] sm:rounded-2xl sm:text-[18px]",
-                    "border-[#DED8E7]",
-                    "focus:border-[#A875D1]",
-                    "focus:shadow-[0_0_0_3px_rgba(168,117,209,0.08)]",
-                  ].join(" ")}
-                />
-              </div>
-            );
-          })}
+              <input
+                ref={(element) => {
+                  inputRefs.current[index] = element;
+                }}
+                type="text"
+                value={character}
+                maxLength={1}
+                placeholder="-"
+                autoComplete="off"
+                autoCapitalize="characters"
+                spellCheck={false}
+                aria-label={`Etkinlik kodu ${index + 1}. karakter`}
+                onChange={(event) =>
+                  handleCodeChange(index, event.target.value)
+                }
+                onKeyDown={(event) => handleKeyDown(index, event)}
+                onFocus={(event) => event.currentTarget.select()}
+                className={[
+                  "h-[54px] min-w-0 flex-1 text-center",
+                  "rounded-xl border bg-white",
+                  "text-[16px] font-semibold uppercase text-[#6A5875]",
+                  "placeholder:text-[#C9C0D0]",
+                  "caret-[#A875D1]",
+                  "transition-all duration-200",
+                  "outline-none",
+                  "sm:h-[60px] sm:rounded-2xl sm:text-[18px]",
+                  errorMessage ? "border-red-300" : "border-[#DED8E7]",
+                  "focus:border-[#A875D1]",
+                  "focus:shadow-[0_0_0_3px_rgba(168,117,209,0.08)]",
+                ].join(" ")}
+              />
+            </div>
+          ))}
         </div>
+
+        {errorMessage ? (
+          <AppText variant="caption" className="mt-3 text-center !text-red-500">
+            {errorMessage}
+          </AppText>
+        ) : null}
 
         <AppButton
           type="button"
-          disabled={code.length !== CODE_LENGTH}
+          onClick={handleCheckCode}
+          disabled={code.length !== CODE_LENGTH || isLoading}
           className="mt-7 w-full"
         >
-          Kodu Kontrol Et
+          {isLoading ? "Kontrol Ediliyor..." : "Kodu Kontrol Et"}
         </AppButton>
 
         <AppButton
           type="button"
           variant="outline"
           onClick={handleQrScanClick}
+          disabled={isLoading}
           className="mt-4 w-full"
         >
           <QrCode size={22} strokeWidth={2} />
