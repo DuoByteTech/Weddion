@@ -3,10 +3,16 @@ import { Camera, Images } from "lucide-react";
 import { AppCard } from "@/components/ui/AppCard";
 import { AppText } from "@/components/ui/AppText";
 
-export function PhotoSourceActions() {
+type PhotoSourceActionsProps = {
+  onGallerySelect: () => void;
+};
+
+export function PhotoSourceActions({
+  onGallerySelect,
+}: PhotoSourceActionsProps) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4">
-      <AppCard className="border border-borderSoft !p-4 sm:!p-5">
+      <AppCard className="border border-borderSoft !p-4 opacity-60 sm:!p-5">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primarySoft text-primaryDark sm:h-14 sm:w-14">
             <Camera size={24} strokeWidth={1.9} />
@@ -25,13 +31,16 @@ export function PhotoSourceActions() {
               variant="caption"
               className="mt-1 !text-[12px] sm:!text-[13px]"
             >
-              Anında fotoğraf çek
+              Yakında
             </AppText>
           </div>
         </div>
       </AppCard>
 
-      <AppCard className="border border-borderSoft !p-4 sm:!p-5">
+      <AppCard
+        onClick={onGallerySelect}
+        className="border border-borderSoft !p-4 transition hover:border-primaryLight hover:bg-primarySoft/30 sm:!p-5"
+      >
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primarySoft text-primaryDark sm:h-14 sm:w-14">
             <Images size={24} strokeWidth={1.9} />

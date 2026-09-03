@@ -1,3 +1,5 @@
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
+
 import { Sparkles } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -8,11 +10,16 @@ import { AppText } from "@/components/ui/AppText";
 
 import { GuestEventHero } from "../components/GuestEventHero";
 import { PhotoSourceActions } from "../components/PhotoSourceActions";
-import { SelectedPhotosSection } from "../components/SelectedPhotosSection";
+import {
+  SelectedPhotosSection,
+  type SelectedGuestPhoto,
+} from "../components/SelectedPhotosSection";
 import { UploadPrivacyNotice } from "../components/UploadPrivacyNotice";
 
 import type { GuestInvitation } from "@/features/guest-access/types/guest-access.types";
 import type { GuestEventInfo } from "../types/guest-upload.types";
+
+const MAX_PHOTOS_PER_UPLOAD = 20;
 
 type GuestUploadLocationState = {
   invitation?: GuestInvitation;
@@ -21,6 +28,14 @@ type GuestUploadLocationState = {
 export function GuestPhotoUploadPage() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const [selectedPhotos, setSelectedPhotos] = useState<SelectedGuestPhoto[]>(
+    [],
+  );
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { invitation } =
     (location.state as GuestUploadLocationState | null) ?? {};
@@ -33,6 +48,90 @@ export function GuestPhotoUploadPage() {
         eventTime: invitation.event_time ?? "",
       }
     : null;
+
+  useEffect(() => {
+    return () => {
+      selectedPhotos.forEach((photo) => {
+        URL.revokeObjectURL(photo.previewUrl);
+      });
+    };
+  }, []);
+
+  const handleGallerySelect = () => {
+    setErrorMessage(null);
+    fileInputRef.current?.click();
+  };
+
+  const handleFilesSelected = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+
+    if (files.length === 0) {
+      return;
+    }
+
+    setErrorMessage(null);
+
+    const remainingPhotoCount = MAX_PHOTOS_PER_UPLOAD - selectedPhotos.length;
+
+    if (remainingPhotoCount <= 0) {
+      setErrorMessage("Tek seferde en fazla 20 fotoğraf seçebilirsiniz.");
+
+      event.target.value = "";
+
+      return;
+    }
+
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+
+    if (imageFiles.length !== files.length) {
+      setErrorMessage("Sadece fotoğraf dosyaları seçebilirsiniz.");
+    }
+
+    const acceptedFiles = imageFiles.slice(0, remainingPhotoCount);
+
+    if (imageFiles.length > remainingPhotoCount) {
+      setErrorMessage(
+        `Tek seferde en fazla ${MAX_PHOTOS_PER_UPLOAD} fotoğraf seçebilirsiniz.`,
+      );
+    }
+
+    const newPhotos: SelectedGuestPhoto[] = acceptedFiles.map((file) => ({
+      id: crypto.randomUUID(),
+      file,
+      previewUrl: URL.createObjectURL(file),
+    }));
+
+    setSelectedPhotos((currentPhotos) => [...currentPhotos, ...newPhotos]);
+
+    /*
+     * Aynı fotoğraf daha sonra yeniden seçilebilsin diye
+     * input değerini temizliyoruz.
+     */
+    event.target.value = "";
+  };
+
+  const handleRemovePhoto = (id: string) => {
+    setSelectedPhotos((currentPhotos) => {
+      const photoToRemove = currentPhotos.find((photo) => photo.id === id);
+
+      if (photoToRemove) {
+        URL.revokeObjectURL(photoToRemove.previewUrl);
+      }
+
+      return currentPhotos.filter((photo) => photo.id !== id);
+    });
+
+    setErrorMessage(null);
+  };
+
+  const handleRemoveAll = () => {
+    selectedPhotos.forEach((photo) => {
+      URL.revokeObjectURL(photo.previewUrl);
+    });
+
+    setSelectedPhotos([]);
+    setErrorMessage(null);
+  };
 
   if (!event) {
     return (
@@ -99,20 +198,46 @@ export function GuestPhotoUploadPage() {
           </AppText>
         </section>
 
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFilesSelected}
+          className="hidden"
+        />
+
         <div className="mt-7">
-          <PhotoSourceActions />
+          <PhotoSourceActions onGallerySelect={handleGallerySelect} />
         </div>
 
+        {errorMessage ? (
+          <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+            <AppText variant="body" className="!text-[13px] !text-red-500">
+              {errorMessage}
+            </AppText>
+          </div>
+        ) : null}
+
         <div className="mt-9">
-          <SelectedPhotosSection count={0} />
+          <SelectedPhotosSection
+            photos={selectedPhotos}
+            onRemove={handleRemovePhoto}
+            onRemoveAll={handleRemoveAll}
+          />
         </div>
 
         <div className="mt-8">
           <UploadPrivacyNotice />
         </div>
 
-        <AppButton type="button" disabled className="mt-9 w-full">
+        <AppButton
+          type="button"
+          disabled={selectedPhotos.length === 0}
+          className="mt-9 w-full"
+        >
           Fotoğrafları Yükle
+          {selectedPhotos.length > 0 ? ` (${selectedPhotos.length})` : ""}
         </AppButton>
       </AppContainer>
     </main>
