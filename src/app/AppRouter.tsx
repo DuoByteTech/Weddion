@@ -15,6 +15,7 @@ import { AdminDashboardPage } from "@/features/admin/pages/AdminDashboardPage";
 import { AdminUsersPage } from "@/features/admin/pages/AdminUsersPage";
 import { AdminInvitationsPage } from "@/features/admin/pages/AdminInvitationsPage";
 import { AdminTemplatesPage } from "@/features/admin/pages/AdminTemplatesPage";
+import { GuestAccessPage } from "@/features/guest-access/pages/GuestAccessPage";
 
 export const AppRouter = () => {
   return (
@@ -23,6 +24,8 @@ export const AppRouter = () => {
         <Route element={<MainLayout />}>
           <Route index element={<HomePage />} />
         </Route>
+
+        <Route path="/guest-access" element={<GuestAccessPage />} />
 
         <Route element={<PublicOnlyRoute />}>
           <Route path="/login" element={<LoginPage />} />

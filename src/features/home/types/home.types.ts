@@ -10,4 +10,5 @@ export type HomeActionItem = {
   title: string;
   description: string;
   icon: LucideIcon;
+  path?: string;
 };

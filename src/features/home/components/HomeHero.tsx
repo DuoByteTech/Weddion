@@ -1,4 +1,5 @@
 import { KeyRound, QrCode } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { AppContainer } from "@/components/ui/AppContainer";
 import { AppLogo } from "@/components/common/AppLogo";
@@ -12,17 +13,29 @@ const actionItems: HomeActionItem[] = [
   {
     title: "QR kod okutarak devam et",
     description:
-      "Etkinlik sahibinin paylaştığı QR kodu okutarak fotoğraf yükleme alanına ulaş.",
+      "Davet sahibinin paylaştığı QR kodu okutarak fotoğraf yükleme alanına ulaş.",
     icon: QrCode,
   },
   {
-    title: "Etkinlik konunu girerek devam et",
-    description: "Etkinlik konunu girerek fotoğraflarınızı yükleyin.",
+    title: "Etkinlik kodu ile devam et",
+    description:
+      "Davet sahibinin paylaştığı özel kodu girerek fotoğraf yükleme alanına ulaş.",
     icon: KeyRound,
+    path: "/guest-access",
   },
 ];
 
 export function HomeHero() {
+  const navigate = useNavigate();
+
+  const handleActionClick = (item: HomeActionItem) => {
+    if (!item.path) {
+      return;
+    }
+
+    navigate(item.path);
+  };
+
   return (
     <AppContainer className="!max-w-[1200px] py-14">
       <div className="grid items-stretch gap-10 lg:grid-cols-2">
@@ -42,7 +55,7 @@ export function HomeHero() {
           </AppText>
         </div>
 
-        <HomeActionPanel items={actionItems} />
+        <HomeActionPanel items={actionItems} onItemClick={handleActionClick} />
       </div>
     </AppContainer>
   );

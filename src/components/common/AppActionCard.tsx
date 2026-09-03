@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
+
 import { ChevronRight } from "lucide-react";
+
 import { AppCard, AppText } from "@/components/ui";
 
 type AppActionCardLayout = "row" | "col";
@@ -14,6 +16,7 @@ type AppActionCardProps = {
   layout?: AppActionCardLayout;
   className?: string;
   iconClassName?: string;
+  onClick?: () => void;
 };
 
 export function AppActionCard({
@@ -25,11 +28,17 @@ export function AppActionCard({
   layout = "row",
   className = "",
   iconClassName = "",
+  onClick,
 }: AppActionCardProps) {
   const isColumn = layout === "col";
 
   return (
-    <AppCard className={`border border-borderSoft ${className}`}>
+    <AppCard
+      onClick={onClick}
+      className={`border border-borderSoft ${
+        onClick ? "cursor-pointer" : ""
+      } ${className}`}
+    >
       <div
         className={
           isColumn ? "flex flex-col gap-4" : "flex w-full items-center gap-5"

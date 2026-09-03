@@ -8,9 +8,10 @@ import type { HomeActionItem } from "../types/home.types";
 
 type HomeActionPanelProps = {
   items: HomeActionItem[];
+  onItemClick?: (item: HomeActionItem) => void;
 };
 
-export function HomeActionPanel({ items }: HomeActionPanelProps) {
+export function HomeActionPanel({ items, onItemClick }: HomeActionPanelProps) {
   return (
     <AppCard className="flex h-full min-h-[360px] flex-col justify-center p-7 sm:p-8 lg:p-10 shadow-card">
       <div className="flex items-center gap-5">
@@ -42,6 +43,7 @@ export function HomeActionPanel({ items }: HomeActionPanelProps) {
             title={item.title}
             description={item.description}
             icon={item.icon}
+            onClick={item.path ? () => onItemClick?.(item) : undefined}
           />
         ))}
       </div>
