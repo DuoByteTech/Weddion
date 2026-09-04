@@ -41,16 +41,13 @@ export function HomeHero() {
     <AppContainer className="!max-w-[1200px] py-14">
       <div className="grid items-stretch gap-10 lg:grid-cols-2">
         <div className="flex flex-col justify-center">
-          <AppLogo size="xl" showName className="mb-7" />
+          <AppLogo size="xl" showName className="hidden lg:flex mb-7" />
 
           <AppText as="h1" variant="serifTitle" className="leading-[0.95]">
-            Davetiyeni <br /> zarifçe oluştur
+            Davetiyeni <br className="hidden lg:flex" /> zarifçe oluştur
           </AppText>
 
-          <AppText
-            variant="body"
-            className="mt-6 max-w-[480px] text-[15px] leading-7"
-          >
+          <AppText variant="body" className="mt-6 max-w-[480px] leading-7">
             Misafirlerini yönet, katılım al ve etkinlik anılarını tek yerde
             topla.
           </AppText>

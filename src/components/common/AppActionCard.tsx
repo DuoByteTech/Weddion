@@ -45,7 +45,7 @@ export function AppActionCard({
         }
       >
         <div
-          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primarySoft text-primaryDark ${iconClassName}`}
+          className={`flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-2xl bg-primarySoft text-primaryDark ${iconClassName}`}
         >
           <Icon size={26} strokeWidth={2} />
         </div>

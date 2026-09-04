@@ -9,7 +9,7 @@ import { ForgotPasswordHero } from "@/features/auth/components/forgot-password/F
 
 export function ForgotPasswordPage() {
   return (
-    <main className="relative h-screen overflow">
+    <main className="relative min-h-dvh overflow-x-hidden">
       <FloralDecorations
         leftImage={{
           src: lavenderCornerBloom,
@@ -23,7 +23,7 @@ export function ForgotPasswordPage() {
         }}
       />
 
-      <div className="relative z-10 flex h-full flex-col">
+      <div className="relative z-10 flex min-h-dvh flex-col">
         <AuthHeader />
 
         <div className="mx-auto grid min-h-0 w-full max-w-7xl flex-1 grid-cols-1 items-center gap-10 py-4 lg:grid-cols-2 xl:gap-12">

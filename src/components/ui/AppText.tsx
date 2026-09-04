@@ -41,8 +41,8 @@ export function AppText<T extends ElementType = "p">({
     captionStrong: "font-manropeExtraBold text-xs sm:text-sm text-primaryDark",
     link: "font-manropeSemiBold text-xs sm:text-sm text-primary",
 
-    serifTitle: "font-cormorantMedium text-5xl sm:text-7xl text-textDark",
-    serifSubtitle: "font-cormorantBold text-lg sm:text-xl text-textDark",
+    serifTitle: "font-cormorantMedium text-4xl sm:text-7xl text-textDark",
+    serifSubtitle: "font-cormorantMedium text-3xl sm:text-xl text-textDark",
 
     invitationNames: "font-tangerineBold text-5xl sm:text-6xl text-textDark",
     invitationAmpersand:
