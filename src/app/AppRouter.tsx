@@ -16,6 +16,7 @@ import { GuestAccessPage } from "@/features/guest-access/pages/GuestAccessPage";
 import { GuestQrScanPage } from "@/features/guest-access/pages/GuestQrScanPage";
 import { GuestPhotoUploadPage } from "@/features/guest-upload/pages/GuestPhotoUploadPage";
 import { FeaturesPage } from "@/features/product-features/pages/FeaturesPage";
+import { PricingPage } from "@/features/pricing/pages/PricingPage";
 
 export const AppRouter = () => {
   return (
@@ -24,6 +25,7 @@ export const AppRouter = () => {
         <Route element={<MainLayout />}>
           <Route index element={<HomePage />} />
           ,<Route path="/features" element={<FeaturesPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
         </Route>
 
         <Route path="/guest-access" element={<GuestAccessPage />} />

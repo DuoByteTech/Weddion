@@ -12,7 +12,7 @@ const navItems = [
   },
   {
     label: "Fiyatlandırma",
-    href: "/",
+    href: "/pricing",
   },
   {
     label: "İletişim",
