@@ -15,7 +15,7 @@ import { AdminTemplatesPage } from "@/features/admin/pages/AdminTemplatesPage";
 import { GuestAccessPage } from "@/features/guest-access/pages/GuestAccessPage";
 import { GuestQrScanPage } from "@/features/guest-access/pages/GuestQrScanPage";
 import { GuestPhotoUploadPage } from "@/features/guest-upload/pages/GuestPhotoUploadPage";
-import { FeaturesPage } from "@/features/features/pages/FeaturesPage";
+import { FeaturesPage } from "@/features/product-features/pages/FeaturesPage";
 
 export const AppRouter = () => {
   return (

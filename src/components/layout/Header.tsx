@@ -7,7 +7,7 @@ import { AppLogo } from "@/components/common/AppLogo";
 
 const navItems = [
   {
-    label: "Özellikler",
+    label: "Weddion’u Keşfet",
     href: "/features",
   },
   {
