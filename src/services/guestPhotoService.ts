@@ -1,6 +1,9 @@
 import type { GuestInvitation } from "@/features/guest-access/types/guest-access.types";
 import { supabase } from "@/lib/supabase";
-import { uploadGuestPhotoSecurely } from "@/services/r2ImageService";
+import {
+  finalizeGuestPhotoUpload,
+  uploadGuestPhotoSecurely,
+} from "@/services/r2ImageService";
 import { compressGuestPhoto } from "@/utils/imageCompression";
 
 type UploadGuestPhotosParams = {
@@ -105,11 +108,8 @@ export async function uploadGuestPhotos({
   try {
     for (const file of files) {
       /*
-       * 1. Fotoğrafı web tarafında
-       * maksimum 3 MB olacak şekilde hazırla.
-       *
-       * Mevcut compressGuestPhoto sistemini
-       * kullanmaya devam ediyoruz.
+       * Fotoğrafı web tarafında maksimum
+       * 3 MB olacak şekilde hazırla.
        */
       const preparedFile = await compressGuestPhoto(file);
 
@@ -118,9 +118,9 @@ export async function uploadGuestPhotos({
       const fileSize = preparedFile.size;
 
       /*
-       * Ek client-side kontrol.
+       * Client-side temel kontrol.
        *
-       * Asıl güvenlik backend tarafındaki
+       * Asıl güvenlik Supabase
        * guest-photo-upload Edge Function'da.
        */
       if (!Number.isFinite(fileSize) || fileSize <= 0) {
@@ -128,27 +128,23 @@ export async function uploadGuestPhotos({
       }
 
       /*
-       * YENİ GÜVENLİ AKIŞ:
+       * Güvenli yükleme akışı:
        *
        * 1. create-upload
-       * 2. Server invitation + code kontrolü
-       * 3. Server R2 key oluşturur
-       * 4. kısa süreli presigned PUT URL
-       * 5. browser -> R2 binary upload
+       * 2. invitation + upload code kontrolü
+       * 3. server R2 key üretir
+       * 4. kısa süreli presigned URL alınır
+       * 5. browser doğrudan R2'ye yükler
        * 6. confirm-upload
-       * 7. server R2 HEAD kontrolü
-       * 8. gerçek size / MIME kontrolü
+       * 7. R2 HEAD kontrolü
+       * 8. gerçek boyut / MIME kontrolü
        * 9. DB kaydı
        */
       const uploadResult = await uploadGuestPhotoSecurely({
         invitationId,
-
         guestUploadCode: normalizedCode,
-
         file: preparedFile,
-
         contentType,
-
         fileSize,
       });
 
@@ -156,29 +152,19 @@ export async function uploadGuestPhotos({
     }
 
     /*
-     * Mobil uygulamadaki mevcut davranışı
-     * webde de koruyoruz.
+     * Tüm fotoğraflar başarıyla yüklendikten sonra
+     * yalnızca oluşmuş gerçek DB kayıtlarının ID'lerini
+     * backend'e gönderiyoruz.
      *
-     * 1 veya birden fazla fotoğraf yüklenirse
-     * tek bir bildirim oluşturulur.
+     * Backend bu fotoğrafları doğrular ve
+     * yükleme başına tek bildirim oluşturur.
      */
     if (createdPhotos.length > 0) {
-      const { error: notificationError } = await supabase.rpc(
-        "create_guest_photo_upload_notification",
-        {
-          target_invitation_id: invitationId,
-
-          target_upload_code: normalizedCode,
-
-          target_photo_count: createdPhotos.length,
-
-          target_first_photo_id: createdPhotos[0]?.id ?? null,
-        },
-      );
-
-      if (notificationError) {
-        console.error("Guest photo notification error:", notificationError);
-      }
+      await finalizeGuestPhotoUpload({
+        invitationId,
+        guestUploadCode: normalizedCode,
+        photoIds: createdPhotos.map((photo) => photo.id),
+      });
     }
 
     return true;

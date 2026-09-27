@@ -47,6 +47,8 @@ type GuestPhotoUploadResponse = {
   fileSize?: number;
   expiresIn?: number;
   photo?: unknown;
+  notificationId?: string | null;
+  photoCount?: number;
   code?: string;
   message?: string;
   error?: string;
@@ -86,8 +88,7 @@ async function getFunctionErrorMessage(error: unknown) {
           return errorText;
         }
       } catch {
-        // Hata gövdesi okunamazsa
-        // genel hata kullanılacak.
+        // Hata gövdesi okunamazsa genel hata kullanılacak.
       }
     }
   }
@@ -254,13 +255,9 @@ async function createGuestPhotoUpload({
       {
         body: {
           action: "create-upload",
-
           invitationId,
-
           uploadCode: guestUploadCode.trim().toUpperCase(),
-
           contentType,
-
           fileSize,
         },
       },
@@ -305,11 +302,8 @@ async function confirmGuestPhotoUpload({
       {
         body: {
           action: "confirm-upload",
-
           invitationId,
-
           uploadCode: guestUploadCode.trim().toUpperCase(),
-
           key,
         },
       },
@@ -335,6 +329,49 @@ async function confirmGuestPhotoUpload({
     key: data.key,
     photo: data.photo,
   };
+}
+
+export async function finalizeGuestPhotoUpload({
+  invitationId,
+  guestUploadCode,
+  photoIds,
+}: {
+  invitationId: string;
+  guestUploadCode: string;
+  photoIds: string[];
+}) {
+  if (photoIds.length === 0) {
+    return true;
+  }
+
+  const { data, error } =
+    await supabase.functions.invoke<GuestPhotoUploadResponse>(
+      "guest-photo-upload",
+      {
+        body: {
+          action: "finalize-upload",
+          invitationId,
+          uploadCode: guestUploadCode.trim().toUpperCase(),
+          photoIds,
+        },
+      },
+    );
+
+  if (error) {
+    const message = await getFunctionErrorMessage(error);
+
+    throw new Error(message);
+  }
+
+  if (!data?.success) {
+    throw new Error(
+      data?.message ??
+        data?.error ??
+        "Fotoğraf yükleme bildirimi oluşturulamadı.",
+    );
+  }
+
+  return true;
 }
 
 export async function uploadGuestPhotoSecurely({
@@ -371,11 +408,9 @@ export async function uploadGuestPhotoSecurely({
    */
   const uploadResponse = await fetch(uploadUrl, {
     method: "PUT",
-
     headers: {
       "Content-Type": contentType,
     },
-
     body: file,
   });
 
