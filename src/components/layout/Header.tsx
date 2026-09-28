@@ -14,28 +14,17 @@ const navItems = [
     label: "Fiyatlandırma",
     href: "/pricing",
   },
-  {
+  /*
     label: "İletişim",
     href: "/",
-  },
+  */
 ];
 
 export function Header() {
-  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   function closeMenu() {
     setIsMenuOpen(false);
-  }
-
-  function goToLogin() {
-    closeMenu();
-    navigate("/login");
-  }
-
-  function goToRegister() {
-    closeMenu();
-    navigate("/register");
   }
 
   return (
@@ -71,7 +60,7 @@ export function Header() {
             <ChevronDown size={16} />
           </button>
 
-          <AppButton
+          {/*  <AppButton
             type="button"
             variant="outline"
             className="min-w-[105px]"
@@ -86,7 +75,7 @@ export function Header() {
             onClick={() => navigate("/login")}
           >
             Giriş Yap
-          </AppButton>
+          </AppButton> */}
         </div>
 
         <button
@@ -126,7 +115,7 @@ export function Header() {
               <ChevronDown size={16} />
             </button>
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            {/* <div className="mt-4 grid grid-cols-2 gap-3">
               <AppButton
                 type="button"
                 variant="outline"
@@ -140,6 +129,7 @@ export function Header() {
                 Giriş Yap
               </AppButton>
             </div>
+            */}
           </div>
         ) : null}
       </AppContainer>
