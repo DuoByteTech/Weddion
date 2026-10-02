@@ -1,7 +1,5 @@
-import { ArrowRight, Check, Gift, Heart, Sparkles } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Check, Gift, Heart, Sparkles } from "lucide-react";
 
-import { AppButton } from "@/components/ui/AppButton";
 import { AppCard } from "@/components/ui/AppCard";
 import { AppContainer } from "@/components/ui/AppContainer";
 import { AppText } from "@/components/ui/AppText";
@@ -16,8 +14,6 @@ const includedItems = [
 ];
 
 export function LaunchPlanCard() {
-  const navigate = useNavigate();
-
   return (
     <section className="py-10 sm:py-14">
       <AppContainer className="!max-w-[980px]">
@@ -95,20 +91,10 @@ export function LaunchPlanCard() {
 
                 <AppText variant="body" className="mt-5 !leading-6">
                   Kredi kartı gerekmez. Abonelik oluşturulmaz. Mevcut
-                  özellikleri ücretsiz kullanmaya başlayabilirsin.
+                  özellikleri ücretsiz kullanabilirsin.
                 </AppText>
 
-                <AppButton
-                  className="mt-8 w-full"
-                  onClick={() => navigate("/register")}
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    Ücretsiz Kullanmaya Başla
-                    <ArrowRight size={17} />
-                  </span>
-                </AppButton>
-
-                <div className="mt-4 flex items-center justify-center gap-1.5">
+                <div className="mt-8 flex items-center justify-center gap-1.5">
                   <Sparkles size={13} className="text-primaryDark" />
 
                   <span className="font-manropeMedium text-[11px] text-textMuted">
