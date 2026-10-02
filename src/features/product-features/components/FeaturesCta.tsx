@@ -1,6 +1,3 @@
-import { ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-
 import purpleHeartDivider from "@/assets/images/purple-heart-divider.png";
 
 import { AppButton } from "@/components/ui/AppButton";
@@ -8,8 +5,6 @@ import { AppContainer } from "@/components/ui/AppContainer";
 import { AppText } from "@/components/ui/AppText";
 
 export function FeaturesCta() {
-  const navigate = useNavigate();
-
   return (
     <section className="pt-12 pb-20 sm:pt-16 sm:pb-24">
       <AppContainer className="!max-w-[900px]">
@@ -37,19 +32,11 @@ export function FeaturesCta() {
             anlarını tek yerde sakla.
           </AppText>
 
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <AppButton
-              className="gap-2 sm:min-w-[160px]"
-              onClick={() => navigate("/register")}
-            >
-              Ücretsiz Başla
-              <ArrowRight size={17} />
-            </AppButton>
-
+          <div className="mt-8 flex justify-center">
             <AppButton
               variant="outline"
               className="sm:min-w-[150px]"
-              onClick={() => navigate("/")}
+              onClick={() => window.location.assign("/")}
             >
               Ana Sayfa
             </AppButton>
