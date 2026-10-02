@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ChevronDown, Globe2, Menu, X } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
-import { AppContainer, AppButton } from "@/components/ui";
+import { AppContainer } from "@/components/ui";
 import { AppLogo } from "@/components/common/AppLogo";
 
 const navItems = [
@@ -15,8 +15,10 @@ const navItems = [
     href: "/pricing",
   },
   /*
+  {
     label: "İletişim",
     href: "/",
+  },
   */
 ];
 
@@ -60,7 +62,8 @@ export function Header() {
             <ChevronDown size={16} />
           </button>
 
-          {/*  <AppButton
+          {/*
+          <AppButton
             type="button"
             variant="outline"
             className="min-w-[105px]"
@@ -75,7 +78,8 @@ export function Header() {
             onClick={() => navigate("/login")}
           >
             Giriş Yap
-          </AppButton> */}
+          </AppButton>
+          */}
         </div>
 
         <button
@@ -115,7 +119,8 @@ export function Header() {
               <ChevronDown size={16} />
             </button>
 
-            {/* <div className="mt-4 grid grid-cols-2 gap-3">
+            {/*
+            <div className="mt-4 grid grid-cols-2 gap-3">
               <AppButton
                 type="button"
                 variant="outline"
@@ -125,7 +130,11 @@ export function Header() {
                 Üye Ol
               </AppButton>
 
-              <AppButton type="button" className="w-full" onClick={goToLogin}>
+              <AppButton
+                type="button"
+                className="w-full"
+                onClick={goToLogin}
+              >
                 Giriş Yap
               </AppButton>
             </div>
